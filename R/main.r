@@ -71,7 +71,7 @@ country$population <- exactextractr::exact_extract(
 # 5. CO2 EMISSIONS
 #-----------------
 
-u <- "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v80_FT2022_GHG/CO2/TOTALS/emi_txt/v8.0_FT2022_GHG_CO2_2022_TOTALS.zip"
+u <- "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v80_FT2022_GHG/CO2/TOTALS/emi_nc/v8.0_FT2022_GHG_CO2_2022_TOTALS_emi_nc.zip"
 
 download.file(
     url = u,
@@ -81,19 +81,9 @@ download.file(
 
 unzip(basename(u))
 
-list.files(
-    path = paste0(
-        getwd(), "/", 
-        "v8.0_FT2022_GHG_CO2_2022_TOTALS_emi_nc/v8.0_FT2022_GHG_CO2_2022_TOTALS_emi.nc"
-    )
-)
+list.files()
 
-co2 <- terra::rast(
-paste0(
-        getwd(), "/", 
-        "v8.0_FT2022_GHG_CO2_2022_TOTALS_emi_nc/v8.0_FT2022_GHG_CO2_2022_TOTALS_emi.nc"
-    )
-)
+co2 <- terra::rast("v8.0_FT2022_GHG_CO2_2022_TOTALS_emi.nc")
 
 # 6. CO2 EMISSIONS PER CAPITA
 #----------------------------
@@ -122,7 +112,7 @@ theme_for_the_win <- function(){
         ),
         plot.margin = unit(
             c(
-                t = 0, r = 0,
+                t = 1, r = 0, # Add 1
                 b = 0, l = 0 
             ), "lines"
         )
@@ -162,8 +152,8 @@ map <- ggplot() +
     scale_fill_gradientn(
         name = "tonnes per capita",
         colors = pal,
-        breaks = round(breaks, 0),
-        labels = round(breaks, 0),
+        breaks = round(breaks, 3), # ADD 3 DECIMAL PLACES
+        labels = round(breaks, 3), # ADD 3 DECIMAL PLACES
         na.value = "white"
     ) +
     guides(
@@ -175,3 +165,12 @@ map <- ggplot() +
     ) +
     coord_sf(crs = crs_lambert) +
     theme_for_the_win()
+
+ggsave(
+    "de_lvl2_co2.png",
+    map,
+    width = 6,
+    height = 8,
+    units = "in",
+    bg = "white"
+)
